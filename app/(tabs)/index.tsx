@@ -1,98 +1,201 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ImageBackground,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { AppHeader } from '@/components/app-header';
+import { SidebarMenu } from '@/components/sidebar-menu';
+import { CategoryCard } from '@/components/category-card';
+import { ProductCard } from '@/components/product-card';
+import { BottomNavigation } from '@/components/bottom-navigation';
+import { Button } from '@/components/ui/button';
+import { PRIMARY_COLOR } from '@/constants/theme';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const categories = [
+  { title: 'Beauté', icon: 'sparkles' },
+  { title: 'Maison', icon: 'home' },
+  { title: 'Santé', icon: 'heart' },
+  { title: 'Alimentation', icon: 'fast-food' },
+  { title: 'Mode', icon: 'shirt' },
+  { title: 'Electronique', icon: 'laptop' },
+  { title: 'Sport', icon: 'football' },
+  { title: 'Enfants', icon: 'baby' },
+];
+
+const products = [
+  { title: 'Fauteuils de luxe', price: '350.000fcfa' },
+  { title: 'Sneakers noires', price: '45.000fcfa' },
+  { title: 'Smartphone bleu', price: '120.000fcfa' },
+  { title: 'Laptop argenté', price: '450.000fcfa' },
+  { title: 'Montre brune', price: '85.000fcfa' },
+  { title: 'Jug blanc', price: '12.000fcfa' },
+];
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const router = useRouter();
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  return (
+    <SafeAreaView style={styles.container} edges={['bottom']}>
+      <AppHeader
+        showSearch
+        showCart
+        showMenu
+        onMenuPress={() => setSidebarVisible(true)}
+        showCurrency
+      />
+      
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Categories */}
+        <View style={styles.section}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoriesContainer}
+          >
+            {categories.map((category, index) => (
+              <CategoryCard
+                key={index}
+                title={category.title}
+                icon={category.icon}
+                onPress={() => console.log(`Category: ${category.title}`)}
+              />
+            ))}
+          </ScrollView>
+        </View>
+
+        {/* Promotion Banner */}
+        <View style={styles.promotionContainer}>
+          <ImageBackground
+            source={require('@/assets/images/icon.png')}
+            style={styles.promotionBanner}
+            imageStyle={styles.promotionImage}
+          >
+            <View style={styles.promotionContent}>
+              <Text style={styles.promotionGreeting}>SALUT!</Text>
+              <Text style={styles.promotionTitle}>PROMOTION</Text>
+              <Text style={styles.promotionSubtitle}>
+                Produit à une Edition limitée
+              </Text>
+              <Text style={styles.promotionSubtitle}>
+                Découvrez l'exclusivité
+              </Text>
+              <Button
+                title="Découvrir"
+                onPress={() => console.log('Discover promotion')}
+                style={styles.promotionButton}
+              />
+            </View>
+          </ImageBackground>
+        </View>
+
+        {/* Products Grid */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Produits</Text>
+          <View style={styles.productsGrid}>
+            {products.map((product, index) => (
+              <ProductCard
+                key={index}
+                title={product.title}
+                price={product.price}
+                onPress={() => console.log(`Product: ${product.title}`)}
+              />
+            ))}
+          </View>
+        </View>
+      </ScrollView>
+
+      <BottomNavigation />
+
+      <SidebarMenu
+        visible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
   },
-  stepContainer: {
-    gap: 8,
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 20,
+  },
+  section: {
+    marginVertical: 16,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#111827',
+    marginBottom: 12,
+    paddingHorizontal: 16,
+  },
+  categoriesContainer: {
+    paddingHorizontal: 16,
+  },
+  promotionContainer: {
+    marginHorizontal: 16,
+    marginVertical: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+    height: 200,
+  },
+  promotionBanner: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: PRIMARY_COLOR,
+  },
+  promotionImage: {
+    opacity: 0.2,
+  },
+  promotionContent: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'center',
+  },
+  promotionGreeting: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  promotionTitle: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 8,
+  },
+  promotionSubtitle: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    opacity: 0.9,
+    marginBottom: 4,
+  },
+  promotionButton: {
+    marginTop: 16,
+    backgroundColor: '#111827',
+    maxWidth: 150,
+  },
+  productsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
   },
 });
