@@ -1,21 +1,23 @@
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useAuth, getInitialRouteForRole } from '@/contexts/AuthContext';
+import { PRIMARY_COLOR } from '@/constants/theme';
+import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Link, useRouter } from 'expo-router';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { PRIMARY_COLOR } from '@/constants/theme';
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const { register: registerUser, isLoading } = useAuth();
   const [formData, setFormData] = useState({
     lastName: '',
     firstName: '',
@@ -26,6 +28,7 @@ export default function RegisterScreen() {
     confirmPassword: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const updateField = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
@@ -58,14 +61,19 @@ export default function RegisterScreen() {
     }
 
     setErrors(newErrors);
+    setApiError(null);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleRegister = () => {
-    if (validate()) {
-      console.log('Register:', formData);
-      // TODO: Implement register logic
-      router.push('/(tabs)');
+  const handleRegister = async () => {
+    if (!validate()) return;
+    const name = [formData.firstName, formData.lastName].filter(Boolean).join(' ').trim() || formData.email;
+    try {
+      const user = await registerUser(name, formData.email.trim(), formData.password);
+      router.replace(getInitialRouteForRole(user.role));
+    } catch (err: unknown) {
+      const message = err && typeof err === 'object' && 'message' in err ? String((err as { message: string }).message) : 'Inscription impossible';
+      setApiError(message);
     }
   };
 
@@ -149,8 +157,16 @@ export default function RegisterScreen() {
                 error={errors.confirmPassword}
               />
 
+              {apiError ? (
+                <Text style={styles.apiError}>{apiError}</Text>
+              ) : null}
               <View style={styles.buttonContainer}>
-                <Button title="S'inscrire" onPress={handleRegister} />
+                <Button
+                  title="S'inscrire"
+                  onPress={handleRegister}
+                  loading={isLoading}
+                  disabled={isLoading}
+                />
               </View>
             </View>
 
@@ -203,6 +219,12 @@ const styles = StyleSheet.create({
   },
   form: {
     marginBottom: 32,
+  },
+  apiError: {
+    color: '#DC2626',
+    fontSize: 14,
+    marginBottom: 12,
+    textAlign: 'center',
   },
   buttonContainer: {
     width: '100%',

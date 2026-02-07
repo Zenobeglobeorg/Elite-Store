@@ -2,6 +2,7 @@ import { EliteLogo } from '@/components/elite-logo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SocialButton } from '@/components/ui/social-button';
+import { useAuth, getInitialRouteForRole } from '@/contexts/AuthContext';
 import { PRIMARY_COLOR } from '@/constants/theme';
 import { useSocialAuth } from '@/services/social-auth';
 import { Link, useRouter } from 'expo-router';
@@ -19,10 +20,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { login, isLoading } = useAuth();
   const { handleSocialLogin } = useSocialAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const validate = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -33,14 +36,18 @@ export default function LoginScreen() {
       newErrors.password = 'Le mot de passe est requis';
     }
     setErrors(newErrors);
+    setApiError(null);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleLogin = () => {
-    if (validate()) {
-      console.log('Login:', { email, password });
-      // TODO: Implement login logic
-      router.push('/(tabs)');
+  const handleLogin = async () => {
+    if (!validate()) return;
+    try {
+      const user = await login(email.trim(), password);
+      router.replace(getInitialRouteForRole(user.role));
+    } catch (err: unknown) {
+      const message = err && typeof err === 'object' && 'message' in err ? String((err as { message: string }).message) : 'Connexion impossible';
+      setApiError(message);
     }
   };
 
@@ -99,8 +106,16 @@ export default function LoginScreen() {
                 </TouchableOpacity>
               </Link>
 
+              {apiError ? (
+                <Text style={styles.apiError}>{apiError}</Text>
+              ) : null}
               <View style={styles.buttonContainer}>
-                <Button title="Se connecter" onPress={handleLogin} />
+                <Button
+                  title="Se connecter"
+                  onPress={handleLogin}
+                  loading={isLoading}
+                  disabled={isLoading}
+                />
               </View>
             </View>
 
@@ -191,6 +206,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: PRIMARY_COLOR,
     fontWeight: '500',
+  },
+  apiError: {
+    color: '#DC2626',
+    fontSize: 14,
+    marginBottom: 12,
+    textAlign: 'center',
   },
   buttonContainer: {
     width: '100%',

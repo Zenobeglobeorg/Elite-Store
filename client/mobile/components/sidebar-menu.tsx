@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useAuth } from '@/contexts/AuthContext';
 import { PRIMARY_COLOR } from '@/constants/theme';
 
 interface SidebarMenuProps {
@@ -19,6 +20,7 @@ interface SidebarMenuProps {
 
 export function SidebarMenu({ visible, onClose }: SidebarMenuProps) {
   const router = useRouter();
+  const { logout, user } = useAuth();
 
   const menuItems = [
     {
@@ -150,6 +152,16 @@ export function SidebarMenu({ visible, onClose }: SidebarMenuProps) {
             {menuItems.map(renderMenuItem)}
           </View>
 
+          {user?.role === 'ADMIN' && renderSection('Administration', [
+            {
+              title: 'Espace Admin',
+              icon: 'shield-checkmark-outline',
+              onPress: () => {
+                onClose();
+                router.push('/admin');
+              },
+            },
+          ])}
           {renderSection('Gestion Financière Elite Cash', financialItems)}
           {renderSection('Devenir Partenaire', partnerItems)}
           {renderSection('Support & Aide', supportItems)}
@@ -168,9 +180,14 @@ export function SidebarMenu({ visible, onClose }: SidebarMenuProps) {
 
           <TouchableOpacity
             style={[styles.menuItem, styles.logoutItem]}
-            onPress={() => {
+            onPress={async () => {
               onClose();
-              router.push('/welcome');
+              try {
+                await logout();
+              } finally {
+                // Toujours rediriger vers welcome (évite le cas où index redirige encore vers (tabs) avec state pas à jour)
+                router.replace('/welcome');
+              }
             }}
             activeOpacity={0.7}
           >
