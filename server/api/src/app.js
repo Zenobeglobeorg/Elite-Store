@@ -7,7 +7,12 @@ const sellerRoutes = require('./routes/seller.routes');
 
 const app = express();
 
-app.use(cors());
+// CORS : en production autoriser le frontend (Vercel). En dev, tout autoriser.
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || process.env.CORS_ORIGIN || true,
+  credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Routes
