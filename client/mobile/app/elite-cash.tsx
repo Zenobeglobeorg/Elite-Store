@@ -9,9 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { AppHeader } from '@/components/app-header';
+import { MainLayout } from '@/components/main-layout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Ionicons } from '@expo/vector-icons';
@@ -40,14 +39,7 @@ export default function EliteCashScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
-      <AppHeader
-        title="Gestion financière Elite cash"
-        showMenu={false}
-        showCart={false}
-        showCurrency
-      />
-
+    <MainLayout title="Elite Cash">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -188,7 +180,7 @@ export default function EliteCashScreen() {
         onClose={() => setCardModalVisible(false)}
         type={transactionType}
       />
-    </SafeAreaView>
+    </MainLayout>
   );
 }
 

@@ -1,10 +1,13 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
+import { Platform } from 'react-native';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+
+const isWeb = Platform.OS === 'web';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -15,6 +18,8 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
         tabBarButton: HapticTab,
+        // Sur mobile : masquer la barre d'onglets native (on utilise BottomNavigation)
+        tabBarStyle: isWeb ? undefined : { display: 'none' },
       }}>
       <Tabs.Screen
         name="index"

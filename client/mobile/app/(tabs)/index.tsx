@@ -1,19 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   ImageBackground,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { AppHeader } from '@/components/app-header';
-import { SidebarMenu } from '@/components/sidebar-menu';
 import { CategoryCard } from '@/components/category-card';
 import { ProductCard } from '@/components/product-card';
-import { BottomNavigation } from '@/components/bottom-navigation';
+import { MainLayout } from '@/components/main-layout';
 import { Button } from '@/components/ui/button';
 import { PRIMARY_COLOR } from '@/constants/theme';
 
@@ -38,19 +33,8 @@ const products = [
 ];
 
 export default function HomeScreen() {
-  const router = useRouter();
-  const [sidebarVisible, setSidebarVisible] = useState(false);
-
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
-      <AppHeader
-        showSearch
-        showCart
-        showMenu
-        onMenuPress={() => setSidebarVisible(true)}
-        showCurrency
-      />
-      
+    <MainLayout showSearch>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -114,22 +98,11 @@ export default function HomeScreen() {
           </View>
         </View>
       </ScrollView>
-
-      <BottomNavigation />
-
-      <SidebarMenu
-        visible={sidebarVisible}
-        onClose={() => setSidebarVisible(false)}
-      />
-    </SafeAreaView>
+    </MainLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
-  },
   scrollView: {
     flex: 1,
   },
