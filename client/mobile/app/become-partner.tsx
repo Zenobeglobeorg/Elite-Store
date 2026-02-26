@@ -1,14 +1,7 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { AppHeader } from '@/components/app-header';
+import { MainLayout } from '@/components/main-layout';
 import { Button } from '@/components/ui/button';
 import { Ionicons } from '@expo/vector-icons';
 import { PRIMARY_COLOR } from '@/constants/theme';
@@ -71,19 +64,12 @@ export default function BecomePartnerScreen() {
     } else if (plan === 'premium') {
       router.push('/create-shop-premium');
     } else {
-      router.push('/create-shop-premium'); // VIP uses premium form for now
+      (router as { push: (href: string) => void }).push('/create-shop-vip');
     }
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
-      <AppHeader
-        title="Devenir partenaire Elite"
-        showMenu={false}
-        showCart={false}
-        showCurrency
-      />
-
+    <MainLayout title="Devenir partenaire Elite">
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -223,15 +209,11 @@ export default function BecomePartnerScreen() {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </MainLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
-  },
   scrollView: {
     flex: 1,
   },

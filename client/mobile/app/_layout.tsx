@@ -25,6 +25,7 @@ export default function RootLayout() {
         <Stack.Screen name="admin" options={{ headerShown: false }} />
         <Stack.Screen name="create-shop-premium" options={{ headerShown: false }} />
         <Stack.Screen name="create-shop-standard" options={{ headerShown: false }} />
+        <Stack.Screen name="create-shop-vip" options={{ headerShown: false }} />
         <Stack.Screen name="elite-cash" options={{ headerShown: false }} />
         <Stack.Screen name="cart" options={{ headerShown: false }} />
         <Stack.Screen name="favorites" options={{ headerShown: false }} />

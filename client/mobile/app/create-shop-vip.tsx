@@ -16,16 +16,16 @@ import { Button } from '@/components/ui/button';
 import { Ionicons } from '@expo/vector-icons';
 import { PRIMARY_COLOR } from '@/constants/theme';
 
-export default function CreateShopPremiumScreen() {
+export default function CreateShopVipScreen() {
   const router = useRouter();
   const [shopName, setShopName] = useState('');
-  const [logo, setLogo] = useState('');
   const [slogan, setSlogan] = useState('');
   const [banner, setBanner] = useState('');
   const [colorPalette, setColorPalette] = useState('');
+  const [photosIaEnabled, setPhotosIaEnabled] = useState(false);
 
   return (
-    <MainLayout title="Création boutique Premium">
+    <MainLayout title="Création boutique VIP">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -35,7 +35,7 @@ export default function CreateShopPremiumScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Section 1: Identité Visuelle et branding */}
+          {/* Section 1: Identité Visuelle et branding (comme Premium) */}
           <CollapsibleSection
             title="1. Identité Visuelle et branding"
             defaultExpanded={true}
@@ -47,7 +47,6 @@ export default function CreateShopPremiumScreen() {
               onChangeText={setShopName}
               placeholder="Entrez le nom de votre boutique"
             />
-
             <TouchableOpacity
               style={styles.fileInput}
               onPress={() => console.log('Add logo')}
@@ -55,14 +54,12 @@ export default function CreateShopPremiumScreen() {
               <Ionicons name="image-outline" size={24} color={PRIMARY_COLOR} />
               <Text style={styles.fileInputText}>Ajouter votre logo</Text>
             </TouchableOpacity>
-
             <Input
               label="Ajouter votre Slogan"
               value={slogan}
               onChangeText={setSlogan}
               placeholder="Entrez votre slogan"
             />
-
             <TouchableOpacity
               style={styles.fileInput}
               onPress={() => console.log('Add banner')}
@@ -70,7 +67,6 @@ export default function CreateShopPremiumScreen() {
               <Ionicons name="image-outline" size={24} color={PRIMARY_COLOR} />
               <Text style={styles.fileInputText}>Ajouter votre bannière</Text>
             </TouchableOpacity>
-
             <Input
               label="Palette de Couleurs"
               value={colorPalette}
@@ -99,7 +95,7 @@ export default function CreateShopPremiumScreen() {
 
           {/* Section 4: Configuration des livraisons */}
           <CollapsibleSection
-            title="Configuration des livraisons (Logistique Elite)"
+            title="4. Configuration des livraisons (Logistique Elite)"
             defaultExpanded={false}
             headerColor={PRIMARY_COLOR}
             icon="diamond"
@@ -107,12 +103,38 @@ export default function CreateShopPremiumScreen() {
             <DeliveryConfigForm />
           </CollapsibleSection>
 
-          {/* Create Button */}
+          {/* Section 5: Avantages VIP */}
+          <CollapsibleSection
+            title="5. Avantages VIP"
+            defaultExpanded={true}
+            headerColor={PRIMARY_COLOR}
+          >
+            <View style={styles.vipInfo}>
+              <Text style={styles.vipInfoText}>
+                Badge « Vendeur Certifié VIP » et système de fidélité (Cashback) inclus.
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.checkbox}
+              onPress={() => setPhotosIaEnabled(!photosIaEnabled)}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name={photosIaEnabled ? 'checkbox' : 'square-outline'}
+                size={24}
+                color={PRIMARY_COLOR}
+              />
+              <Text style={styles.checkboxText}>
+                Activer les Photos IA pour mes produits (optimisation d’images)
+              </Text>
+            </TouchableOpacity>
+          </CollapsibleSection>
+
           <View style={styles.buttonContainer}>
             <Button
-              title="CREER MAINTENANT"
+              title="CREER MA BOUTIQUE VIP"
               onPress={() => {
-                console.log('Create shop');
+                console.log('Create VIP shop');
                 router.back();
               }}
               style={styles.createButton}
@@ -140,14 +162,12 @@ function ShopInfoForm() {
         onChangeText={setCategory}
         placeholder="Choisissez une catégorie"
       />
-
       <Input
         label="Configuration WhatsApp (lien direct)"
         value={whatsapp}
         onChangeText={setWhatsapp}
         placeholder="Entrez votre lien WhatsApp"
       />
-
       <TouchableOpacity
         style={styles.checkbox}
         onPress={() => setShareWhatsapp(!shareWhatsapp)}
@@ -162,7 +182,6 @@ function ShopInfoForm() {
           Autoriser le partage de ma boutique sur mes statuts WhatsApp en un Clic
         </Text>
       </TouchableOpacity>
-
       <TouchableOpacity
         style={styles.checkbox}
         onPress={() => setChatEnabled(!chatEnabled)}
@@ -173,11 +192,8 @@ function ShopInfoForm() {
           size={24}
           color={PRIMARY_COLOR}
         />
-        <Text style={styles.checkboxText}>
-          Activer le chat client-vendeur
-        </Text>
+        <Text style={styles.checkboxText}>Activer le chat client-vendeur</Text>
       </TouchableOpacity>
-
       <Input
         label="Description de la Boutique"
         value={description}
@@ -211,31 +227,27 @@ function LogisticsConfigForm() {
           color={PRIMARY_COLOR}
         />
         <Text style={styles.checkboxText}>
-          Relancez en un clic les clients qui à visiter la boutique
+          Relancez en un clic les clients qui ont visité la boutique
         </Text>
       </TouchableOpacity>
-
       <Input
         label="Localisation de la boutique"
         value={location}
         onChangeText={setLocation}
         placeholder="Entrez l'adresse de votre boutique"
       />
-
       <Input
         label="Disponibilité (Horaire Elite)"
         value={schedule}
         onChangeText={setSchedule}
         placeholder="Entrez vos horaires"
       />
-
       <Input
         label="Associer un livreur à ma boutique"
         value={deliveryPerson}
         onChangeText={setDeliveryPerson}
         placeholder="Sélectionnez un livreur"
       />
-
       <Input
         label="Politique de livraison"
         value={deliveryPolicy}
@@ -262,14 +274,12 @@ function DeliveryConfigForm() {
         onChangeText={setDeliveryOptions}
         placeholder="Configurez vos options de livraison"
       />
-
       <Input
         label="Zones de livraison"
         value={deliveryZones}
         onChangeText={setDeliveryZones}
         placeholder="Définissez vos zones de livraison"
       />
-
       <Input
         label="Coûts de livraison"
         value={deliveryCost}
@@ -281,16 +291,9 @@ function DeliveryConfigForm() {
 }
 
 const styles = StyleSheet.create({
-  keyboardView: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 40,
-  },
+  keyboardView: { flex: 1 },
+  scrollView: { flex: 1 },
+  scrollContent: { padding: 16, paddingBottom: 40 },
   fileInput: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -308,6 +311,17 @@ const styles = StyleSheet.create({
     color: PRIMARY_COLOR,
     fontWeight: '500',
   },
+  vipInfo: {
+    backgroundColor: '#F3F4F6',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  vipInfoText: {
+    fontSize: 14,
+    color: '#374151',
+    lineHeight: 20,
+  },
   checkbox: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -320,23 +334,8 @@ const styles = StyleSheet.create({
     color: '#374151',
     lineHeight: 20,
   },
-  textArea: {
-    height: 100,
-    textAlignVertical: 'top',
-  },
-  buttonContainer: {
-    marginTop: 24,
-    marginBottom: 16,
-  },
-  createButton: {
-    backgroundColor: '#111827',
-    borderRadius: 12,
-  },
-  createButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
+  textArea: { height: 100, textAlignVertical: 'top' as const },
+  buttonContainer: { marginTop: 24, marginBottom: 16 },
+  createButton: { backgroundColor: '#111827', borderRadius: 12 },
+  createButtonText: { color: '#FFFFFF', fontSize: 18, fontWeight: 'bold' },
 });
-
-

@@ -24,6 +24,14 @@ export function SidebarMenu({ visible, onClose }: SidebarMenuProps) {
 
   const menuItems = [
     {
+      title: 'Accueil',
+      icon: 'home-outline',
+      onPress: () => {
+        onClose();
+        router.push('/');
+      },
+    },
+    {
       title: 'Mon Profil',
       icon: 'person-outline',
       onPress: () => {

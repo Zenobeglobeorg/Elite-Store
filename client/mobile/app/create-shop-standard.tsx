@@ -8,9 +8,8 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { AppHeader } from '@/components/app-header';
+import { MainLayout } from '@/components/main-layout';
 import { CollapsibleSection } from '@/components/ui/collapsible-section';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -24,14 +23,7 @@ export default function CreateShopStandardScreen() {
   const [slogan, setSlogan] = useState('');
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
-      <AppHeader
-        title="Création de votre boutique Standard"
-        showMenu={false}
-        showCart={false}
-        showCurrency
-      />
-
+    <MainLayout title="Création boutique Standard">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -112,7 +104,7 @@ export default function CreateShopStandardScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </MainLayout>
   );
 }
 
@@ -256,10 +248,6 @@ function DeliveryConfigForm() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
   keyboardView: {
     flex: 1,
   },
