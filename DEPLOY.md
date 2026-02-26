@@ -41,6 +41,11 @@ Ce guide décrit comment déployer le **frontend** (Expo web) sur **Vercel** et 
 5. **Migrations**  
    Le dossier `prisma/migrations/` est versionné avec une migration initiale. Au **démarrage** du service, Railway exécute `prisma migrate deploy` puis lance le serveur. Aucune action à faire si tu as bien `DATABASE_URL` dans les variables.
 
+   **Si tu as l’erreur P3009 (failed migrations)** : une migration a échoué sur la base. Pour repartir de zéro sur Supabase :
+   1. Ouvre le **SQL Editor** de ton projet Supabase.
+   2. Exécute le script `server/api/prisma/supabase-reset-migrations.sql` (il supprime les tables et l’historique des migrations).
+   3. Redéploie sur Railway : au démarrage, `prisma migrate deploy` réappliquera la migration.
+
 6. **Récupérer l’URL du backend**  
    Dans Railway : service → Settings → Networking → Generate Domain.  
    Tu obtiens une URL du type `https://ton-api.up.railway.app`. **Conserve cette URL** pour le frontend.
