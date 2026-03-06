@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,17 +7,43 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { EliteLogo } from '@/components/elite-logo';
 import { Button } from '@/components/ui/button';
 import { SocialButton } from '@/components/ui/social-button';
 import { PRIMARY_COLOR } from '@/constants/theme';
-import { useSocialAuth } from '@/services/social-auth';
+import { handleGoogleSignIn } from '@/services/social-auth';
+import { useAuth, getInitialRouteForRole } from '@/contexts/AuthContext';
+import { authStorage } from '@/services/auth-storage';
 
 export default function WelcomeScreen() {
-  const { handleSocialLogin } = useSocialAuth();
+  const router = useRouter();
+  const { setUser } = useAuth();
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  const onGooglePress = async () => {
+    setGoogleLoading(true);
+    try {
+      const result = await handleGoogleSignIn();
+      if (result.success && result.data) {
+        const { token, ...userData } = result.data;
+        await authStorage.setToken(token);
+        await authStorage.setUser(userData);
+        setUser(userData);
+        router.replace(getInitialRouteForRole(userData.role));
+      } else {
+        Alert.alert('Connexion Google', result.error ?? 'Connexion annulée');
+      }
+    } catch {
+      Alert.alert('Erreur', 'Une erreur est survenue lors de la connexion Google');
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -60,23 +86,24 @@ export default function WelcomeScreen() {
 
             {/* Social Login */}
             <View style={styles.socialContainer}>
-              <Text style={styles.socialText}>S'inscrire avec un autre compte</Text>
+              <Text style={styles.socialText}>Continuer avec</Text>
               <View style={styles.socialButtons}>
-                <SocialButton
-                  provider="facebook"
-                  onPress={() => handleSocialLogin('facebook')}
-                  size={56}
-                />
-                <SocialButton
-                  provider="google"
-                  onPress={() => handleSocialLogin('google')}
-                  size={56}
-                />
-                <SocialButton
-                  provider="apple"
-                  onPress={() => handleSocialLogin('apple')}
-                  size={56}
-                />
+                <SocialButton provider="facebook" onPress={() => {}} size={56} />
+                <View>
+                  <SocialButton
+                    provider="google"
+                    onPress={onGooglePress}
+                    size={56}
+                  />
+                  {googleLoading && (
+                    <ActivityIndicator
+                      style={styles.loader}
+                      size="small"
+                      color={PRIMARY_COLOR}
+                    />
+                  )}
+                </View>
+                <SocialButton provider="apple" onPress={() => {}} size={56} />
               </View>
             </View>
           </View>
@@ -156,6 +183,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 20,
+  },
+  loader: {
+    marginTop: 4,
   },
 });
 

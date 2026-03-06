@@ -4,10 +4,13 @@ import { Input } from '@/components/ui/input';
 import { SocialButton } from '@/components/ui/social-button';
 import { useAuth, getInitialRouteForRole } from '@/contexts/AuthContext';
 import { PRIMARY_COLOR } from '@/constants/theme';
-import { useSocialAuth } from '@/services/social-auth';
+import { handleGoogleSignIn } from '@/services/social-auth';
+import { authStorage } from '@/services/auth-storage';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -20,12 +23,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { login, isLoading } = useAuth();
-  const { handleSocialLogin } = useSocialAuth();
+  const { login, isLoading, setUser } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [apiError, setApiError] = useState<string | null>(null);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const validate = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -48,6 +51,26 @@ export default function LoginScreen() {
     } catch (err: unknown) {
       const message = err && typeof err === 'object' && 'message' in err ? String((err as { message: string }).message) : 'Connexion impossible';
       setApiError(message);
+    }
+  };
+
+  const onGooglePress = async () => {
+    setGoogleLoading(true);
+    try {
+      const result = await handleGoogleSignIn();
+      if (result.success && result.data) {
+        const { token, ...userData } = result.data;
+        await authStorage.setToken(token);
+        await authStorage.setUser(userData);
+        setUser(userData);
+        router.replace(getInitialRouteForRole(userData.role));
+      } else {
+        Alert.alert('Connexion Google', result.error ?? 'Connexion annulée');
+      }
+    } catch {
+      Alert.alert('Erreur', 'Une erreur est survenue lors de la connexion Google');
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
@@ -123,21 +146,18 @@ export default function LoginScreen() {
             <View style={styles.socialSection}>
               <Text style={styles.socialText}>Continuer avec</Text>
               <View style={styles.socialButtons}>
-                <SocialButton
-                  provider="facebook"
-                  onPress={() => handleSocialLogin('facebook')}
-                  size={50}
-                />
-                <SocialButton
-                  provider="google"
-                  onPress={() => handleSocialLogin('google')}
-                  size={50}
-                />
-                <SocialButton
-                  provider="apple"
-                  onPress={() => handleSocialLogin('apple')}
-                  size={50}
-                />
+                <SocialButton provider="facebook" onPress={() => {}} size={50} />
+                <View style={styles.googleWrapper}>
+                  <SocialButton provider="google" onPress={onGooglePress} size={50} />
+                  {googleLoading && (
+                    <ActivityIndicator
+                      style={styles.googleLoader}
+                      size="small"
+                      color={PRIMARY_COLOR}
+                    />
+                  )}
+                </View>
+                <SocialButton provider="apple" onPress={() => {}} size={50} />
               </View>
             </View>
 
@@ -229,6 +249,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 16,
+    alignItems: 'flex-start',
+  },
+  googleWrapper: {
+    alignItems: 'center',
+  },
+  googleLoader: {
+    marginTop: 4,
   },
   registerContainer: {
     flexDirection: 'row',

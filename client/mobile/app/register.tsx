@@ -1,10 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { SocialButton } from '@/components/ui/social-button';
 import { useAuth, getInitialRouteForRole } from '@/contexts/AuthContext';
 import { PRIMARY_COLOR } from '@/constants/theme';
+import { handleGoogleSignIn } from '@/services/social-auth';
+import { authStorage } from '@/services/auth-storage';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -17,7 +22,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function RegisterScreen() {
   const router = useRouter();
-  const { register: registerUser, isLoading } = useAuth();
+  const { register: registerUser, isLoading, setUser } = useAuth();
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [formData, setFormData] = useState({
     lastName: '',
     firstName: '',

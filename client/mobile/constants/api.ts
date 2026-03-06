@@ -22,6 +22,7 @@ export const API_ENDPOINTS = {
   auth: {
     register: '/api/auth/register',
     login: '/api/auth/login',
+    google: '/api/auth/google',
   },
   buyer: {
     me: '/api/buyer/me',
